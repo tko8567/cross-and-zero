@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<RelativeLayout 
+    android:id="@+id/rl"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent" >
+    
+    
+    <TextView 
+        android:id="@+id/cr_cnt"
+        android:gravity="center_horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textColor="#000000"
+        android:textSize="27sp"
+        android:paddingTop="70sp"
+        android:text="Cross: 0"/>
+	    
+	<GridLayout
+	    android:id="@+id/gl"
+	    android:orientation="horizontal"
+	    android:layout_width="wrap_content"
+	    android:layout_height="wrap_content" 
+	    android:layout_centerHorizontal="true"
+	    android:layout_centerVertical="true">
+	</GridLayout>
+	
+	<TextView 
+	    android:id="@+id/ze_cnt"
+        android:gravity="center_horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textColor="#000000"
+        android:textSize="27sp"
+        android:layout_alignParentBottom="true"
+        android:paddingBottom="70sp"
+        android:text="Zero: 0"/>
+	
+	
+
+</RelativeLayout>
