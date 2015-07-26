@@ -1,2 +1,2 @@
 # cross-and-zero
-Repo zontains com.tko.crossandzero project
+Repo сontains com.tko.crossandzero project
