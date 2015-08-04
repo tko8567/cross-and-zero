@@ -11,11 +11,6 @@ public class Cluster {
 		this.isCrossed=false;
 	}
 	
-	public Cluster (byte x, byte y){
-		this.isMark=false;
-		this.isCrossed=false;
-	}
-
 	public boolean isMark() {
 		return isMark;
 	}

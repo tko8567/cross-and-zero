@@ -6,11 +6,15 @@ import android.app.ActionBar.LayoutParams;
 import android.app.Activity;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.transition.Fade;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.animation.Animation;
 import android.view.animation.Animation.AnimationListener;
 import android.view.animation.AnimationUtils;
+import android.widget.Button;
 import android.widget.GridLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -21,11 +25,10 @@ public class OnePhoneGame extends Activity {
 	private GridLayout gl;
 	
 	protected ImageView bts[] = new ImageView[16];
-	protected boolean isCross = true;
 	private TextView TVcrCnt;
 	private TextView TVzeCnt;
 	
-	private Animation hideAnim;
+	private Animation[] fadeOut = new Animation[16];
 	
 	private byte AnimTurn = 0;
 	
@@ -38,15 +41,10 @@ public class OnePhoneGame extends Activity {
 		Data.crCount=0;
 		Data.zeCount=0;
 		Data.filled=0;
-		isCross = true;
+		Data.isCross = true;
 		
 		TVcrCnt = (TextView) findViewById(R.id.cr_cnt);
 		TVzeCnt = (TextView) findViewById(R.id.ze_cnt);
-
-		for (int i=0; i<16; i++){
-			hideAnim=AnimationUtils.loadAnimation(this, R.anim.hide);
-			
-		}
 		
 		TVcrCnt.setTextColor(Color.rgb(00, 00, 255));
 		
@@ -54,7 +52,15 @@ public class OnePhoneGame extends Activity {
 		gl.setColumnCount(4);
 		
 		
+		int d=0;
 		
+		for (int i=0; i < 16; i++){
+			
+			fadeOut[i] = AnimationUtils.loadAnimation(OnePhoneGame.this.getApplicationContext(), R.anim.abc_fade_out);
+			fadeOut[i].setStartOffset(d);
+			fadeOut[i].setAnimationListener(fadeOutListener);
+			d+=75;
+		}
 		
 		
 		for (int i=0; i<16; i++){
@@ -62,6 +68,7 @@ public class OnePhoneGame extends Activity {
 			bts[i].setImageResource(R.drawable.square);
 			bts[i].setLayoutParams(new LayoutParams(100,100));
 			bts[i].setId(i);
+			bts[i].setImageAlpha(0);
 			gl.addView(bts[i]);
 			bts[i].setOnClickListener(squareClick);
 			
@@ -71,7 +78,37 @@ public class OnePhoneGame extends Activity {
 		
 		
 		
+		
 	}
+	
+	
+	/**
+	 * Menu
+	 *  - Restart : resets the field
+	 */
+	
+	
+	@Override
+	public boolean onCreateOptionsMenu(Menu menu) {
+		
+		menu.add("Restart");
+		
+		return super.onCreateOptionsMenu(menu);
+	}
+	
+	
+	@Override
+	public boolean onMenuItemSelected(int featureId, MenuItem item) {
+
+		Data.restart();
+		refresh();
+		return super.onMenuItemSelected(featureId, item);
+	}
+	
+	
+	
+	
+	
 	
 	private OnClickListener squareClick = new OnClickListener() {
 		
@@ -81,7 +118,7 @@ public class OnePhoneGame extends Activity {
 			
 			int i=v.getId();
 			
-			if (isCross){
+			if (Data.isCross){
 
 				TVzeCnt.setTextColor(Color.rgb(00, 00, 255));
 				TVcrCnt.setTextColor(Color.rgb(00, 00, 00));
@@ -92,7 +129,7 @@ public class OnePhoneGame extends Activity {
 			}
 			
 			/*Toast.makeText(OnePhoneGame.this.getApplicationContext(), Integer.toString(v.getId()), Toast.LENGTH_SHORT).show();*/ /**to check bt's id * must be 0-15*/
-			if (isCross && !Data.field[i].isMark) {
+			if (Data.isCross && !Data.field[i].isMark) {
 				
 				bts[i].setImageResource(R.drawable.c_square);
 				Data.field[i].setCrossed(true);
@@ -104,7 +141,7 @@ public class OnePhoneGame extends Activity {
 			}
 			
 			if (!Data.field[i].isMark) {
-				isCross=!isCross;
+				Data.isCross = !Data.isCross;
 				Data.filled++;
 				
 			}
@@ -116,9 +153,11 @@ public class OnePhoneGame extends Activity {
 				Toast.makeText(OnePhoneGame.this.getApplicationContext(), "Filled, calculating...", Toast.LENGTH_SHORT).show();
 				calculate();
 				refresh();
-				if (Data.filled==16) {
+				
+				if (Data.filled==16 || (Data.crCount >= 25 || Data.zeCount >= 25)) {
+					
 					hideTheField();
-					findTheWinner();
+					//findTheWinner(); !
 				}
 			}
 		}
@@ -147,65 +186,26 @@ public class OnePhoneGame extends Activity {
 		TVzeCnt.setText("Zero: "+Integer.toString(Data.zeCount));
 		
 	}
-	
-	
-	//////////////////////////////////////////////
-	/**
-	 * bts - массив с кнопками
-	 * кнопок 16
-	 * 
-	 */
-	
-	/*
-	private void hideTheField(int i){
-		
-		for (int j=100; j>80; j--){//начало ухода кнопки в альфу
-			
-			bts[i].setImageAlpha(j);
-			
-			try{ //задержка на 1мс с отловленным исключением
-				Thread.currentThread().sleep(1);
-			} catch(InterruptedException e) {
-				e.printStackTrace();
-			}
-			
-		}
-		
-		if (i>0)hideTheField(i-1); //рекурсивный переход к следующей кнопке
-		
-		
-		
-		for (int j=80; j>-1; j--){ //уход в альфу до конца
-			bts[i].setImageAlpha(j);
-			
-			try{
-				
-				Thread.currentThread().sleep(1);
-			} catch(InterruptedException e) {
-				
-				e.printStackTrace();
-			}
-		}
-	}
-	*/
 
 	private void hideTheField(){
 		
+		for (int i=0; i<16; i++){
 			
-			bts[AnimTurn].startAnimation(hideAnim);
+			bts[i].startAnimation(fadeOut[i]);
+			
+		}
 		
 	}
 	
-	//////////////////////////////////////////////
-	
-	
+	/* !!!!!
 	private void findTheWinner(){
 		
 		
 	}
+	*/
 	
 	
-	Animation.AnimationListener hideAnimListener = new Animation.AnimationListener(){
+	private Animation.AnimationListener fadeOutListener = new Animation.AnimationListener(){
 		
 		@Override
 		public void onAnimationStart(Animation animation) {
@@ -222,8 +222,13 @@ public class OnePhoneGame extends Activity {
 		@Override
 		public void onAnimationEnd(Animation animation) {
 			// TODO Auto-generated method stub
-			if (AnimTurn < 15) {AnimTurn++; bts[AnimTurn].startAnimation(hideAnim);}
+			
+			bts[AnimTurn].setImageAlpha(0);
+			AnimTurn++;
 		}
 	};
+	
+	
+	
 	
 }
